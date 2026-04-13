@@ -1,0 +1,38 @@
+{
+  "timestamp": "2026-04-13T15:39:27.393746",
+  "total_tests": 5,
+  "passed_tests": 4,
+  "success_rate": "80.0%",
+  "results": [
+    {
+      "test": "API Health",
+      "success": true,
+      "details": "API is accessible (status: 200)",
+      "timestamp": "2026-04-13T15:39:26.759288"
+    },
+    {
+      "test": "Application Submit",
+      "success": true,
+      "details": "Application ID: 4e414433-b794-48e9-9b57-ae8666c86d2c",
+      "timestamp": "2026-04-13T15:39:26.955133"
+    },
+    {
+      "test": "Application Validation",
+      "success": true,
+      "details": "Correctly rejected invalid data",
+      "timestamp": "2026-04-13T15:39:27.115259"
+    },
+    {
+      "test": "Applications List",
+      "success": false,
+      "details": "Status 500: Internal Server Error",
+      "timestamp": "2026-04-13T15:39:27.259184"
+    },
+    {
+      "test": "Applications Stats",
+      "success": true,
+      "details": "Total applications: 1",
+      "timestamp": "2026-04-13T15:39:27.392773"
+    }
+  ]
+}
