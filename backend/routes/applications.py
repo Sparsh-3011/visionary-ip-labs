@@ -77,7 +77,8 @@ async def list_applications(
 ):
     """Get list of all applications (admin endpoint)"""
     try:
-        applications = await db.applications.find().sort("createdAt", -1).skip(skip).limit(limit).to_list(limit)
+        # Exclude _id field from query to avoid ObjectId serialization issues
+        applications = await db.applications.find({}, {"_id": 0}).sort("createdAt", -1).skip(skip).limit(limit).to_list(limit)
         total = await db.applications.count_documents({})
         
         return {
