@@ -113,3 +113,14 @@ code {
         border-bottom-color: inherit;
     }
 }
+
+
+/* Force hide Emergent badge */
+#emergent-badge,
+a[href*="emergent.sh"],
+a[href*="utm_source=emergent-badge"] {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
