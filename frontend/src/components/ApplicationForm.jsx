@@ -57,17 +57,23 @@ const ApplicationForm = () => {
       return;
     }
 
-    // Phone validation
-    const phoneRegex = /^[0-9]{10}$/;
-    if (!phoneRegex.test(formData.phone.replace(/\s/g, ''))) {
-      toast.error('Please enter a valid 10-digit phone number');
+    // Phone validation - allow 10+ digits
+    const cleanPhone = formData.phone.replace(/\D/g, ''); // Remove all non-digits
+    if (cleanPhone.length < 10) {
+      toast.error('Please enter a valid phone number (at least 10 digits)');
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      const response = await axios.post(`${BACKEND_URL}/api/applications/submit`, formData);
+      // Submit with cleaned phone number
+      const submissionData = {
+        ...formData,
+        phone: cleanPhone
+      };
+      
+      const response = await axios.post(`${BACKEND_URL}/api/applications/submit`, submissionData);
       
       if (response.data.success) {
         setIsSubmitted(true);
