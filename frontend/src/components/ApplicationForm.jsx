@@ -3,7 +3,6 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { toast } from 'sonner';
 import { Loader2, CheckCircle, Send } from 'lucide-react';
 import axios from 'axios';
@@ -24,6 +23,7 @@ const ApplicationForm = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,49 +31,95 @@ const ApplicationForm = () => {
       ...prev,
       [name]: value
     }));
+    // Clear error for this field
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
-  const handleSelectChange = (name, value) => {
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.fullName.trim()) {
+      newErrors.fullName = 'Name is required';
+    }
+
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        newErrors.email = 'Invalid email format';
+      }
+    }
+
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'Phone is required';
+    } else {
+      const cleanPhone = formData.phone.replace(/\D/g, '');
+      if (cleanPhone.length < 10) {
+        newErrors.phone = 'Phone must be at least 10 digits';
+      }
+    }
+
+    if (!formData.collegeName.trim()) {
+      newErrors.collegeName = 'College name is required';
+    }
+
+    if (!formData.course.trim()) {
+      newErrors.course = 'Course is required';
+    }
+
+    if (!formData.year) {
+      newErrors.year = 'Year is required';
+    }
+
+    if (!formData.areaOfInterest) {
+      newErrors.areaOfInterest = 'Area of interest is required';
+    }
+
+    if (!formData.motivation.trim()) {
+      newErrors.motivation = 'Motivation is required';
+    } else if (formData.motivation.trim().length < 10) {
+      newErrors.motivation = 'Please provide more details (at least 10 characters)';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validation
-    if (!formData.fullName || !formData.email || !formData.phone || !formData.collegeName || 
-        !formData.course || !formData.year || !formData.areaOfInterest || !formData.motivation) {
-      toast.error('Please fill in all required fields');
-      return;
-    }
-
-    // Email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      toast.error('Please enter a valid email address');
-      return;
-    }
-
-    // Phone validation - allow 10+ digits
-    const cleanPhone = formData.phone.replace(/\D/g, ''); // Remove all non-digits
-    if (cleanPhone.length < 10) {
-      toast.error('Please enter a valid phone number (at least 10 digits)');
+    console.log('Form submitted, validating...');
+    
+    if (!validateForm()) {
+      toast.error('Please fill in all required fields correctly');
       return;
     }
 
     setIsSubmitting(true);
 
     try {
-      // Submit with cleaned phone number
+      // Clean phone number
+      const cleanPhone = formData.phone.replace(/\D/g, '');
+      
       const submissionData = {
-        ...formData,
-        phone: cleanPhone
+        fullName: formData.fullName.trim(),
+        email: formData.email.trim(),
+        phone: cleanPhone,
+        collegeName: formData.collegeName.trim(),
+        course: formData.course.trim(),
+        year: formData.year,
+        areaOfInterest: formData.areaOfInterest,
+        motivation: formData.motivation.trim()
       };
+
+      console.log('Submitting data:', submissionData);
       
       const response = await axios.post(`${BACKEND_URL}/api/applications/submit`, submissionData);
+      
+      console.log('Response:', response.data);
       
       if (response.data.success) {
         setIsSubmitted(true);
@@ -92,11 +138,13 @@ const ApplicationForm = () => {
             motivation: ''
           });
           setIsSubmitted(false);
+          setErrors({});
         }, 3000);
       }
     } catch (error) {
       console.error('Error submitting application:', error);
-      toast.error(error.response?.data?.detail || 'Failed to submit application. Please try again.');
+      const errorMessage = error.response?.data?.detail || 'Failed to submit application. Please try again.';
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -154,6 +202,7 @@ const ApplicationForm = () => {
                 className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-amber-500"
                 required
               />
+              {errors.fullName && <p className="text-red-400 text-sm mt-1">{errors.fullName}</p>}
             </div>
 
             {/* Email and Phone */}
@@ -170,6 +219,7 @@ const ApplicationForm = () => {
                   className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-amber-500"
                   required
                 />
+                {errors.email && <p className="text-red-400 text-sm mt-1">{errors.email}</p>}
               </div>
               <div>
                 <Label htmlFor="phone" className="text-slate-300 mb-2 block">Phone Number *</Label>
@@ -183,6 +233,7 @@ const ApplicationForm = () => {
                   className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-amber-500"
                   required
                 />
+                {errors.phone && <p className="text-red-400 text-sm mt-1">{errors.phone}</p>}
               </div>
             </div>
 
@@ -198,6 +249,7 @@ const ApplicationForm = () => {
                 className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-amber-500"
                 required
               />
+              {errors.collegeName && <p className="text-red-400 text-sm mt-1">{errors.collegeName}</p>}
             </div>
 
             {/* Course and Year */}
@@ -213,41 +265,50 @@ const ApplicationForm = () => {
                   className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-amber-500"
                   required
                 />
+                {errors.course && <p className="text-red-400 text-sm mt-1">{errors.course}</p>}
               </div>
               <div>
                 <Label htmlFor="year" className="text-slate-300 mb-2 block">Year of Study *</Label>
-                <Select onValueChange={(value) => handleSelectChange('year', value)} value={formData.year}>
-                  <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white focus:border-amber-500">
-                    <SelectValue placeholder="Select year" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-slate-900 border-slate-700">
-                    <SelectItem value="1st Year">1st Year</SelectItem>
-                    <SelectItem value="2nd Year">2nd Year</SelectItem>
-                    <SelectItem value="3rd Year">3rd Year</SelectItem>
-                    <SelectItem value="4th Year">4th Year</SelectItem>
-                    <SelectItem value="Final Year">Final Year</SelectItem>
-                    <SelectItem value="Postgraduate">Postgraduate</SelectItem>
-                  </SelectContent>
-                </Select>
+                <select
+                  id="year"
+                  name="year"
+                  value={formData.year}
+                  onChange={handleChange}
+                  className="w-full bg-slate-900/50 border border-slate-700 text-white rounded-md px-3 py-2 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                  required
+                >
+                  <option value="">Select year</option>
+                  <option value="1st Year">1st Year</option>
+                  <option value="2nd Year">2nd Year</option>
+                  <option value="3rd Year">3rd Year</option>
+                  <option value="4th Year">4th Year</option>
+                  <option value="Final Year">Final Year</option>
+                  <option value="Postgraduate">Postgraduate</option>
+                </select>
+                {errors.year && <p className="text-red-400 text-sm mt-1">{errors.year}</p>}
               </div>
             </div>
 
             {/* Area of Interest */}
             <div>
               <Label htmlFor="areaOfInterest" className="text-slate-300 mb-2 block">Area of Interest *</Label>
-              <Select onValueChange={(value) => handleSelectChange('areaOfInterest', value)} value={formData.areaOfInterest}>
-                <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white focus:border-amber-500">
-                  <SelectValue placeholder="Select your primary interest" />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-900 border-slate-700">
-                  <SelectItem value="AI & Machine Learning">AI & Machine Learning</SelectItem>
-                  <SelectItem value="Patent Research">Patent Research</SelectItem>
-                  <SelectItem value="Startup & Entrepreneurship">Startup & Entrepreneurship</SelectItem>
-                  <SelectItem value="Academic Research">Academic Research</SelectItem>
-                  <SelectItem value="Innovation Development">Innovation Development</SelectItem>
-                  <SelectItem value="IP Management">IP Management</SelectItem>
-                </SelectContent>
-              </Select>
+              <select
+                id="areaOfInterest"
+                name="areaOfInterest"
+                value={formData.areaOfInterest}
+                onChange={handleChange}
+                className="w-full bg-slate-900/50 border border-slate-700 text-white rounded-md px-3 py-2 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                required
+              >
+                <option value="">Select your primary interest</option>
+                <option value="AI & Machine Learning">AI & Machine Learning</option>
+                <option value="Patent Research">Patent Research</option>
+                <option value="Startup & Entrepreneurship">Startup & Entrepreneurship</option>
+                <option value="Academic Research">Academic Research</option>
+                <option value="Innovation Development">Innovation Development</option>
+                <option value="IP Management">IP Management</option>
+              </select>
+              {errors.areaOfInterest && <p className="text-red-400 text-sm mt-1">{errors.areaOfInterest}</p>}
             </div>
 
             {/* Motivation */}
@@ -263,6 +324,7 @@ const ApplicationForm = () => {
                 className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-amber-500 resize-none"
                 required
               />
+              {errors.motivation && <p className="text-red-400 text-sm mt-1">{errors.motivation}</p>}
             </div>
 
             {/* Submit Button */}
