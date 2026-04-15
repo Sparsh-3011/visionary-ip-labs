@@ -7,7 +7,8 @@ import { toast } from 'sonner';
 import { Loader2, CheckCircle, Send } from 'lucide-react';
 import axios from 'axios';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+// Use empty string for Vercel (same domain) or process.env for external backend
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
 
 const ApplicationForm = () => {
   const [formData, setFormData] = useState({

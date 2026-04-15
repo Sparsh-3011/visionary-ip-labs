@@ -21,7 +21,8 @@ import {
   School
 } from 'lucide-react';
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+// Use empty string for Vercel (same domain) or process.env for external backend
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || '';
 
 const AdminDashboard = () => {
   const [applications, setApplications] = useState([]);
