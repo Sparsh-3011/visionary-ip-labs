@@ -14,9 +14,20 @@ from datetime import datetime, timezone
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
+# MongoDB connection with explicit TLS/SSL settings
 mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
+client = AsyncIOMotorClient(
+    mongo_url,
+    tls=True,
+    tlsAllowInvalidCertificates=False,
+    serverSelectionTimeoutMS=30000,
+    connectTimeoutMS=30000,
+    socketTimeoutMS=30000,
+    retryWrites=True,
+    retryReads=True,
+    maxPoolSize=10,
+    minPoolSize=1
+)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
