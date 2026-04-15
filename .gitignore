@@ -1,19 +1,42 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+venv/
+backend/venv/
+
+# Environment variables
+.env
+*.env.local
+
+# Build outputs
+frontend/build/
+frontend/dist/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+*.sqlite
+
+# Temp files
+/tmp/
+*.tmp
+
+# Automation outputs
+.emergent/
+
+# Cache
+frontend/node_modules/.cache
+frontend/.cache
 archive.zip
--e 
-# Environment and credential files
-.env
-.env.*
-*.env
-credentials.json
-*.pem
-*.key
-.credentials
--e 
-# Environment and credential files
-.env
-.env.*
-*.env
-credentials.json
-*.pem
-*.key
-.credentials
