@@ -1,0 +1,23 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/applications/submit",
+      "destination": "/api/submit"
+    },
+    {
+      "source": "/api/applications/list",
+      "destination": "/api/list"
+    },
+    {
+      "source": "/api/applications/stats",
+      "destination": "/api/stats"
+    }
+  ],
+  "functions": {
+    "api/**/*.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  },
+  "regions": ["iad1"]
+}
