@@ -43,14 +43,12 @@ const CredibilitySection = () => {
           <div className="relative">
             <div className="absolute inset-0 bg-gradient-to-br from-amber-500/30 to-blue-500/30 rounded-2xl blur-3xl"></div>
             <div className="relative bg-slate-800/50 backdrop-blur-sm border-2 border-amber-500/30 rounded-2xl p-8 shadow-2xl">
-              <div className="aspect-square bg-gradient-to-br from-slate-700 to-slate-800 rounded-xl flex items-center justify-center mb-6 border border-amber-500/20">
-                <div className="text-center">
-                  <div className="w-32 h-32 bg-amber-500/20 rounded-full mx-auto mb-4 flex items-center justify-center">
-                    <GraduationCap className="w-16 h-16 text-amber-400" />
-                  </div>
-                  <p className="text-slate-400 text-sm">[Mentor Image Placeholder]</p>
-                  <p className="text-slate-500 text-xs mt-2">Upload your mentor's photo</p>
-                </div>
+              <div className="aspect-square rounded-xl overflow-hidden mb-6 border-2 border-amber-500/20">
+                <img 
+                  src="/images/mentor.jpg" 
+                  alt="Program Mentor" 
+                  className="w-full h-full object-cover"
+                />
               </div>
               <div className="text-center">
                 <h3 className="text-2xl font-bold text-white mb-2">Program Mentor</h3>

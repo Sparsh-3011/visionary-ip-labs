@@ -40,9 +40,11 @@ const Header = () => {
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-lg flex items-center justify-center font-bold text-slate-950">
-              VIP
-            </div>
+            <img 
+              src="/images/logo.jpg" 
+              alt="Visionary IP Labs" 
+              className="h-12 w-auto object-contain"
+            />
             <div>
               <h1 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-amber-600">
                 Visionary IP Labs
