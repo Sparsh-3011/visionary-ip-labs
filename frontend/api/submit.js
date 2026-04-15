@@ -1,19 +1,33 @@
 const { MongoClient } = require('mongodb');
 
 let cachedClient = null;
+let cachedDb = null;
 
 async function connectToDatabase() {
-  if (cachedClient) {
-    return cachedClient;
+  if (cachedClient && cachedDb) {
+    return { client: cachedClient, db: cachedDb };
   }
 
-  const client = await MongoClient.connect(process.env.MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
+  const uri = process.env.MONGODB_URI;
+  
+  if (!uri) {
+    throw new Error('MONGODB_URI environment variable is not set');
+  }
+
+  console.log('Connecting to MongoDB...');
+
+  const client = await MongoClient.connect(uri, {
+    serverSelectionTimeoutMS: 5000, // 5 second timeout
+    socketTimeoutMS: 5000,
   });
 
+  const db = client.db(process.env.DB_NAME || 'visionary_ip_labs');
+
   cachedClient = client;
-  return client;
+  cachedDb = db;
+
+  console.log('Connected to MongoDB successfully');
+  return { client, db };
 }
 
 module.exports = async (req, res) => {
@@ -40,10 +54,10 @@ module.exports = async (req, res) => {
   }
 
   try {
-    console.log('Received request body:', req.body);
+    console.log('Received POST request');
+    console.log('Request body:', req.body);
 
-    const client = await connectToDatabase();
-    const db = client.db(process.env.DB_NAME || 'visionary_ip_labs');
+    const { db } = await connectToDatabase();
     
     const {
       fullName,
@@ -80,12 +94,12 @@ module.exports = async (req, res) => {
       status: 'pending'
     };
 
-    console.log('Inserting application:', application);
+    console.log('Inserting application...');
 
     // Insert into database
     const result = await db.collection('applications').insertOne(application);
 
-    console.log('Insert result:', result);
+    console.log('Insert successful:', result.insertedId);
 
     return res.status(200).json({
       success: true,
@@ -94,10 +108,13 @@ module.exports = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in submit function:', error);
+    console.error('Error in submit function:', error.message);
+    console.error('Full error:', error);
+    
     return res.status(500).json({
       success: false,
-      detail: error.message || 'Internal server error'
+      detail: error.message || 'Internal server error',
+      error: 'Database connection failed'
     });
   }
 };
